@@ -1,0 +1,21 @@
+{
+  "name": "TaskPanel",
+  "version": "0.0.1",
+  "description": "Kanban for Students",
+  "main": "server.js",
+  "repository": "",
+  "author": "Matt Katz",
+  "dependencies": {
+    "async": "~2.5.0",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.1",
+    "express-handlebars": "^3.0.0",
+    "express-session": "^1.15.6",
+    "mongoose": "^4.12.0",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-google-oauth": "^1.0.0",
+    "socket.io": "~2.0.3"
+  }
+}
