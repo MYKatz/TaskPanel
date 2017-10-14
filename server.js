@@ -22,7 +22,7 @@ var session = require('express-session');
 var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.bodyParser());
+//app.use(express.bodyParser());
 
 //USE HANDLEBARS AS VIEW ENGINE
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
