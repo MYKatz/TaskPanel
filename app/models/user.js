@@ -16,7 +16,8 @@ var userSchema = mongoose.Schema({
        name: String,
        picture: String
    },
-   data : Array
+   data : Array,
+   subjects: Array
    
     
 });

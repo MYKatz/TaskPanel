@@ -174,6 +174,23 @@ app.post("/api/remove", function(req, res){
   
 });
 
+app.post("/api/addsubject", function(req, res){
+  if(req.user){
+    var user = req.user;
+  
+    user.subjects.push(req.body);
+  
+    user.save(function(error){
+      if(error){throw error;}
+    });
+  }
+  
+});
+
+app.get("/api/getsubjects", function(req, res){
+  res.send(req.user.subjects);
+});
+
 app.use(express.static(path.resolve(__dirname, 'assets')));
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){

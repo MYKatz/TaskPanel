@@ -70,7 +70,7 @@ desired effect
   <header class="main-header">
 
     <!-- Logo -->
-    <a href="index2.html" class="logo">
+    <a href="#" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini">T<b>P</b></span>
       <!-- logo for regular state and mobile devices -->
@@ -289,10 +289,11 @@ desired effect
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h1>
+      <h1 style="padding-bottom: 5px">
         Your Board
         <small></small>
       </h1>
+      <div id="subjectList"><span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-subject">+Add Subject</span></div>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
         <li class="active">Here</li>
@@ -475,15 +476,7 @@ desired effect
      user experience. -->
 <script>
   $(document).ready(function(){
-    $.get("/api/get", function(data){
-      var boi = data;
-      console.log(boi);
-      for(var i = 0; i<boi.length;i++){
-        var toAdd = '<div class="box box-default" id="'+boi[i]._id+'"><div class="box-body">'+htmlencode(boi[i].body)+'</div>'+'<i type="button" class="fa fa-minus removeButton" aria-hidden="true" style="float:right; color: #FF0000; cursor: pointer; margin-top:-12px"></i></div>'+'</div>';
-        $("#list"+(boi[i].column+1)).append(toAdd);
-        
-      }
-    });
+    
     
   });
   
@@ -494,8 +487,7 @@ desired effect
   
   function addNew(obj){
     $.post("/api/set", obj, function(data){
-      var toAdd = '<div class="box box-default" id="'+data._id+'"><div class="box-body">'+htmlencode(data.body)+'</div>'+'<i type="button" class="fa fa-minus removeButton" aria-hidden="true" style="float:right; color: #FF0000; cursor: pointer; margin-top:-12px"></i></div>'+'</div>';
-      $("#list"+(data.column+1)).append(toAdd);
+      location.reload(true);
     });
   }
   
@@ -532,9 +524,21 @@ desired effect
       
       }
       addNew(obj);
-      $("#inputTask").val("");
-      $("#inputSubject").val("");
-      $("#inputDate").val("");
+      //$("#inputTask").val("");
+      //$("#inputSubject").val("");
+      //$("#inputDate").val("");
+      
+    }
+  });
+  
+  $(document).on("click", "#addNewSubject", function(){
+    if($("#inputSName").val() != ""){
+      var obj = {
+        subject: $("#inputSName").val(),
+        color: $("#inputColor").val()
+      }
+      $.post("/api/addsubject", obj);
+      location.reload(true);
     }
   });
   
@@ -563,6 +567,37 @@ desired effect
             }
         }
 });
+  
+  $.getJSON("/api/getsubjects", function(data){
+    var subjects = [];
+    console.log(typeof data);
+    console.log(data);
+    for(var i=0;i<data.length;i++){
+      if(typeof data[i] === 'object'){
+        $("#subjectList").prepend('<span class="label" style="margin: 0 3px 0 3px; background-color:'+ data[i].color + '">' + data[i].subject + '</span>');
+        subjects.push(data[i]);
+        $("#inputSubject").append('<option value="'+data[i].subject+'">'+data[i].subject+'</option>')
+      }
+    }
+    $.get("/api/get", function(data){
+      var boi = data;
+      console.log(subjects);
+      for(var i = 0; i<boi.length;i++){
+        console.log(boi[i].subject);
+        var result = $.grep(subjects, function(e){ return e.subject == boi[i].subject; });
+        console.log(JSON.stringify(result));
+        if(result[0]){
+          var color = result[0].color || "#d2d6de";
+        }
+        else{
+          var color = "#d2d6de";
+        }
+        var toAdd = '<div class="box box-default" id="'+boi[i]._id+'" style="border-top-color:'+color +'"><div class="box-body">'+htmlencode(boi[i].body)+'</div>'+'<i type="button" class="fa fa-minus removeButton" aria-hidden="true" style="float:right; color: #FF0000; cursor: pointer; margin-top:-12px"></i></div>'+'</div>';
+        $("#list"+(boi[i].column+1)).append(toAdd);
+        
+      }
+    });
+  });
   
   
   //sanitize inputs (not necessarily needed but whateva)
@@ -597,7 +632,9 @@ desired effect
                   <label for="inputTitle" class="col-sm-2 control-label">Subject:</label>
 
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputSubject" placeholder="Math">
+                    <select type="select" class="form-control" id="inputSubject">
+                      <option value="misc">misc</option>
+                    </select>
                   </div>
                 </div> <br />
                 
@@ -622,5 +659,50 @@ desired effect
           </div>
           <!-- /.modal-dialog -->
         </div>
+        
+<div class="modal fade" id="modal-subject">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add a new Subject</h4>
+              </div>
+              <div class="modal-body">
+                <div>
+              <div class="box-body">
+                 <br />
+                
+                <div class="form-group">
+                  <label for="inputTitle" class="col-sm-2 control-label">Name:</label>
+
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputSName" placeholder="English">
+                  </div>
+                </div> <br />
+                
+                <div class="form-group">
+                  <label for="inputTitle" class="col-sm-2 control-label">Color:</label>
+
+                  <div class="col-sm-10">
+                    <input type="color" class="form-control" id="inputColor" placeholder="">
+                  </div>
+                </div>
+                
+              </div>
+              
+            </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button id="addNewSubject" type="button" class="btn btn-primary" data-dismiss="modal">Add Subject</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+
+
 </body>
 </html>
