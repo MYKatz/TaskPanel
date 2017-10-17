@@ -187,6 +187,25 @@ app.post("/api/addsubject", function(req, res){
   
 });
 
+app.post("/api/removesubject", function(req,res){
+  if(req.user){
+    var user = req.user;
+    console.log("SUBJECTS:" + req.user.subjects)
+    for(var i = 0;i<user.subjects.length;i++){
+      console.log(user.subjects[i].subject);
+      console.log(req.body.subject);
+      if(user.subjects[i].subject == req.body.subject){
+        console.log("WE GOT ONE");
+        user.subjects.splice(i, 1);
+        break;
+      }
+    }
+    user.save(function(error){
+      if(error){throw error;}
+    });
+  }
+});
+
 app.get("/api/getsubjects", function(req, res){
   res.send(req.user.subjects);
 });

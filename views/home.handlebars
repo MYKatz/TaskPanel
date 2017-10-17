@@ -293,7 +293,7 @@ desired effect
         Your Board
         <small></small>
       </h1>
-      <div id="subjectList"><span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-subject">+Add Subject</span></div>
+      <div id="subjectList"><span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-subject">+Add Subject</span>  <span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-remove-subject">-Remove Subject</span></div>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
         <li class="active">Here</li>
@@ -542,6 +542,13 @@ desired effect
     }
   });
   
+  $(document).on("click", "#removeSubject", function(){
+    if($("#inputRemoveSubject").val() != ""){
+      $.post("/api/removesubject", {subject: $("#inputRemoveSubject").val()});
+      location.reload();
+    }
+  });
+  
   $( function() {
     $( "#inputDate" ).datepicker();
   } );
@@ -576,7 +583,8 @@ desired effect
       if(typeof data[i] === 'object'){
         $("#subjectList").prepend('<span class="label" style="margin: 0 3px 0 3px; background-color:'+ data[i].color + '">' + data[i].subject + '</span>');
         subjects.push(data[i]);
-        $("#inputSubject").append('<option value="'+data[i].subject+'">'+data[i].subject+'</option>')
+        $("#inputSubject").append('<option value="'+data[i].subject+'">'+data[i].subject+'</option>');
+        $("#inputRemoveSubject").append('<option value="'+data[i].subject+'">'+data[i].subject+'</option>')
       }
     }
     $.get("/api/get", function(data){
@@ -696,6 +704,42 @@ desired effect
               <div class="modal-footer">
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
                 <button id="addNewSubject" type="button" class="btn btn-primary" data-dismiss="modal">Add Subject</button>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+<div class="modal fade" id="modal-remove-subject">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Remove Subject</h4>
+              </div>
+              <div class="modal-body">
+                <div>
+              <div class="box-body">
+                 <br />
+                
+                <label for="inputTitle" class="col-sm-2 control-label">Subject:</label>
+
+                  <div class="col-sm-10">
+                    <select type="select" class="form-control" id="inputRemoveSubject">
+                      
+                    </select>
+                  </div>
+                
+                
+                
+              </div>
+              
+            </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button id="removeSubject" type="button" class="btn btn-primary" data-dismiss="modal">Remove Subject</button>
               </div>
             </div>
             <!-- /.modal-content -->
