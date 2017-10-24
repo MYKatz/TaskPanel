@@ -130,7 +130,7 @@ app.post("/api/set", function(req,res){
     newTask.body = req.body.body;
 
     newTask.subject = req.body.subject;
-    if(Object.prototype.toString.call(req.body.due) === "[object Date]"){
+    if(req.body.due != "Invalid Date"){
       newTask.due = req.body.due;
     }
     

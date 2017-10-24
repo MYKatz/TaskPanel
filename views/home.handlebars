@@ -601,7 +601,11 @@ desired effect
         else{
           var color = "#d2d6de";
         }
-        var toAdd = '<div class="box box-default" id="'+boi[i]._id+'" style="border-top-color:'+color +'"><div class="box-body">'+htmlencode(boi[i].body)+'</div>'+'<i type="button" class="fa fa-minus removeButton" aria-hidden="true" style="float:right; color: #FF0000; cursor: pointer; margin-top:-12px"></i></div>'+'</div>';
+        var due = "";
+        if(boi[i].due){
+          due = htmlencode("Due: " + boi[i].due.substring(0,10) || "");
+        }
+        var toAdd = '<div class="box box-default" id="'+boi[i]._id+'" style="border-top-color:'+color +'"><div class="box-body" style="padding-bottom: 0">'+htmlencode(boi[i].body)+'</div>'+'<span style=" font-size: 1.1rem; ">'+due+'</span>'+'<i type="button" class="fa fa-minus removeButton" aria-hidden="true" style="float:right; color: #FF0000; cursor: pointer; bottom: 0; right: 0; position: absolute;"></i></div>'+'</div>';
         $("#list"+(boi[i].column+1)).append(toAdd);
         
       }
