@@ -119,6 +119,13 @@ app.get("/app/home", function(req, res){
   }
 });
 
+app.get("/demo", function(req, res){
+  res.render("demo", {
+    user: {name: "John Doe"},
+    pic: "/images/profile.png"
+  });
+})
+
 //API
 
 app.post("/api/set", function(req,res){

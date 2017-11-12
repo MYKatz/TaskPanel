@@ -23,9 +23,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="/dist/css/skins/skin-blue.min.css">
   <!--Bootstrap datepicker -->
   <link rel="stylesheet" href="/assets/css/jquery-ui.css">
-  
   <link rel="stylesheet" href="/assets/css/chardinjs.css">
-  
   
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -41,7 +39,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
         
   <style>
     
-    
+    .chardinjs-helper-layer.chardinjs-left{
+      border-left: 0
+    }
     
   </style>
 </head>
@@ -184,7 +184,7 @@ desired effect
           <!-- User Account Menu -->
           <li class="dropdown user user-menu">
             <!-- Menu Toggle Button -->
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-intro="You can find your sign-out button here." data-position="bottom">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <!-- The user image in the navbar-->
               <img src="{{pic}}" class="user-image" alt="User Image">
               <!-- hidden-xs hides the username on small devices so only the image appears. -->
@@ -297,9 +297,9 @@ desired effect
         <small></small>
       </h1>
       <div id="subjectList"><span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-subject" data-intro="Add a subject to automatically color-code your tasks." data-position="bottom">+Add Subject</span>  <span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-remove-subject" data-intro="click here to delete one of your subjects" data-position="right">-Remove Subject</span></div>
-      <ol class="breadcrumb">
+      <ol class="breadcrumb" data-intro="Click here if you want to see this screen again." data-position="left">
+        <button id="helpMe" class="btn btn-primary"><i class="fa fa-question-circle" aria-hidden="true" ></i></button>
         <!--<li><a href="#"><i class="fa fa-dashboard"></i> Your Board</a></li> -->
-        <button id="helpMe" class="btn btn-primary"><i class="fa fa-question-circle" aria-hidden="true"></i></button>
         <!-- <li class="active">Here</li> -->
       </ol>
     </section>
@@ -310,10 +310,10 @@ desired effect
       <div class="row" style="">
         <div class="col-md-3">
           <div class="box box-default">
-            <div class="box-header with-border">
+            <div class="box-header with-border" data-intro="Click on the '+' icon to add a task to your to-do list." data-position="right">
               <i class="fa fa-list"></i>
 
-              <h3 class="box-title">To-Do</h3>  <i type="button" id="modalIcon" data-toggle="modal" data-target="#modal-default" class="fa fa-plus" aria-hidden="true" style="float:right; color: #00FF00; cursor: pointer" data-intro="Click here to add a task into your To-Do list." data-position="right"></i>
+              <h3 class="box-title" >To-Do</h3>  <i type="button" id="modalIcon" data-toggle="modal" data-target="#modal-default" class="fa fa-plus" aria-hidden="true" style="float:right; color: #00FF00; cursor: pointer" ></i>
             </div>
             <!-- /.box-header -->
             <ul id="list1" class="box-body connected" style="height: 60rem; overflow-y: scroll">
@@ -376,9 +376,7 @@ desired effect
   <!-- /.content-wrapper -->
 
   <!-- Main Footer -->
-  
   <footer class="main-footer" data-intro="Click anywhere to close the help screen." data-position="top">
-    <span style="width: 100%; height: 1px"></span>
     <!-- To the right -->
     <div class="pull-right hidden-xs">
       Created by <a href="https://twitter.com/MYKatz01">Matt Katz</a>
@@ -482,18 +480,17 @@ desired effect
      Both of these plugins are recommended to enhance the
      user experience. -->
 <script>
-  //CHARDIN CODE
-
   $("#helpMe").on("click", function(){
     $('body').chardinJs('start');
   });
 
 
-  //Other code
   $(document).ready(function(){
     
-    
+     $('body').chardinJs('start');
   });
+  
+  var subjects = [];
   
   $(document).on("click", ".removeButton", function(){
     $.post("/api/remove", {"id": $(this).parent().attr("id")});
@@ -501,9 +498,29 @@ desired effect
   });
   
   function addNew(obj){
-    $.post("/api/set", obj, function(data){
-      location.reload(true);
-    });
+    //Add color to this later.
+    var result = [];
+    result = $.grep(subjects, function(e){ return e.subject == obj.subject; });
+    var color = "";
+    if(result[0]){
+          var color = result[0].color || "#d2d6de";
+        }
+        else{
+          var color = "#d2d6de";
+    }
+    
+    
+    var due = "";
+    if(obj.due){
+          due = htmlencode("Due: " + obj.due.toISOString().substring(0,10) || "");
+        }
+    
+    var toAdd = '<div class="box box-default" id="'+""+'" style="border-top-color:'+color +'"><div class="box-body" style="padding-bottom: 0">'+htmlencode(obj.body)+'</div>'+'<span style=" font-size: 1.1rem; ">'+due+'</span>'+'<i type="button" class="fa fa-minus removeButton" aria-hidden="true" style="float:right; color: #FF0000; cursor: pointer; bottom: 0; right: 0; position: absolute;"></i></div>'+'</div>';
+    $("#list"+(obj.column+1)).append(toAdd);  
+    
+    $("#inputTask").val("");
+    $("#inputDate").val("");
+    $("#inputSubject").val("misc");
   }
   
   function update(id, place){
@@ -552,8 +569,20 @@ desired effect
         subject: $("#inputSName").val(),
         color: $("#inputColor").val()
       }
-      $.post("/api/addsubject", obj);
-      location.reload(true);
+      subjects.push(obj);
+      //location.reload(true);
+    }
+    $("#subjectList").html('<span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-subject" data-intro="Add a subject to automatically color-code your tasks." data-position="bottom">+Add Subject</span>  <span class="label" style="background-color: black; cursor: pointer" data-toggle="modal" data-target="#modal-remove-subject" data-intro="click here to delete one of your subjects" data-position="right">-Remove Subject</span>');
+    $("#inputSubject").html('<option value="misc">misc</option>');
+    $("#subjectRemoveSubject").html('<option value="misc">misc</option>');
+    $("#inputSName").val("");
+    $("#inputColor").val("");
+    for(var i=0;i<subjects.length;i++){
+      if(typeof subjects[i] === 'object'){
+        $("#subjectList").prepend('<span class="label" style="margin: 0 3px 0 3px; background-color:'+ subjects[i].color + '">' + subjects[i].subject + '</span>');
+        $("#inputSubject").append('<option value="'+subjects[i].subject+'">'+subjects[i].subject+'</option>');
+        $("#inputRemoveSubject").append('<option value="'+subjects[i].subject+'">'+subjects[i].subject+'</option>')
+      }
     }
   });
   
@@ -589,8 +618,8 @@ desired effect
             }
         }
 });
-  
-  $.getJSON("/api/getsubjects", function(data){
+/*
+  $.getJSO("/api/getsubjects", function(data){
     var subjects = [];
     console.log(typeof data);
     console.log(data);
@@ -625,7 +654,7 @@ desired effect
       }
     });
   });
-  
+*/  
   
   //sanitize inputs (not necessarily needed but whateva)
   function htmlencode(str) {
